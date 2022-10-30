@@ -239,8 +239,8 @@ class GDA_Metric_Learning(GDANet):
         else:
             raise NotImplementedError()
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
-
-        labels = torch.cat([labels, labels], dim=0)
+        # Generate labels for positive samples from 0 to N in order for the loss function to generate negative samples.
+        labels = torch.cat([torch.arange(len(labels)), torch.arange(len(labels))], dim=0)
 
         if self.use_miner:
             hard_pairs = self.miner(query_embed, labels)
@@ -414,8 +414,8 @@ class DDA_Metric_Learning(Module):
         else:
             raise NotImplementedError()
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
-
-        labels = torch.cat([labels, labels], dim=0)
+        # Generate labels for positive samples from 0 to N in order for the loss function to generate negative samples.
+        labels = torch.cat([torch.arange(len(labels)), torch.arange(len(labels))], dim=0)
         if self.use_miner:
             hard_pairs = self.miner(query_embed, labels)
             return self.loss(query_embed, labels, hard_pairs)
@@ -573,8 +573,8 @@ class PPI_Metric_Learning(Module):
         else:
             raise NotImplementedError()
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
-
-        labels = torch.cat([labels, labels], dim=0)
+        # Generate labels for positive samples from 0 to N in order for the loss function to generate negative samples.
+        labels = torch.cat([torch.arange(len(labels)), torch.arange(len(labels))], dim=0)
         if self.use_miner:
             hard_pairs = self.miner(query_embed, labels)
             return self.loss(query_embed, labels, hard_pairs)
