@@ -1,11 +1,23 @@
-# GDA Prediction
-
-Motivations
-
-Pre-training the relationship between human genes and disease for prediction.
+# Heterogeneous biomedical entity representation learning for gene-disease association prediction
 
 
-Methodology
+## Installation
 
-![image](https://user-images.githubusercontent.com/111442062/201148867-8fa424fb-4cbf-46e2-aa31-ae1bd388639c.gif)
 
+
+```bash
+pip install pytorch-metric-learning
+pip install adapter-transformers
+pip install lightgbm
+```
+
+## Executing program
+
+Make sure you are in the directory ~/dpa_pretrain/scripts
+You adjust the required parameters directly.
+
+```bash
+bash <pretrain/finetune.sh>
+```
+
+Check your results in the wandb account.
