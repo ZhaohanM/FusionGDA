@@ -6,6 +6,7 @@
 
 
 ```bash
+pip install pytdc
 pip install pytorch-metric-learning
 pip install adapter-transformers
 pip install lightgbm
