@@ -1,17 +1,40 @@
+import json
 import sys
-
+import os
 import torch
 from tdc.multi_pred import GDA
-
+from utils.data_loader import GDA_Dataset
+import numpy as np
+import pandas as pd
 sys.path.append("../")
 
 
 class DisGeNETProcessor:
-    def __init__(self, data_dir="../data/downstream/"):
-        data = GDA(name="DisGeNET", path=data_dir)
-        self.datasets = data.get_split()
-        self.name = "DisGeNET"
-
+    def __init__(self, data_dir="nfs/dpa_pretrain/data/downstream/"):
+        
+        data = GDA(name="DisGeNET")  # , path=data_dir
+        data.binarize(threshold = 0.5, order = 'ascending')
+        # data_df = data.balanced(oversample = True)
+        # datasets_neg=data.neg_sample(frac = 1)
+        # Cold-Start Split: split = data.get_split(method = 'cold_split', column_name = ['Drug_ID', 'Cell Line_ID'])
+        self.datasets = data.get_split(method = 'random', seed = 42, frac = [0.7, 0.1, 0.2])
+        self.name = "DisGeNET"  
+        
+        self.train_dataset_df = self.datasets['train']
+        self.train_dataset_df = self.train_dataset_df[
+            ["Gene", "Disease", "Y"]
+        ].dropna() 
+        
+        self.val_dataset_df = self.datasets["valid"]
+        self.val_dataset_df = self.val_dataset_df[
+            ["Gene", "Disease", "Y"]
+        ].dropna() 
+        
+        self.test_dataset_df = self.datasets["test"]
+        self.test_dataset_df = self.test_dataset_df[
+            ["Gene", "Disease", "Y"]
+        ].dropna() 
+        
     def get_train_examples(self, test=False):
         """get training examples
 
@@ -23,22 +46,22 @@ class DisGeNETProcessor:
         """
         if test == 1:  # Small testing set, to reduce the running time
             return (
-                self.datasets["train"]["Gene"].values[:4096],
-                self.datasets["train"]["Disease"].values[:4096],
-                self.datasets["train"]["Y"].values[:4096],
+                self.train_dataset_df["Gene"].values[:4096],
+                self.train_dataset_df["Disease"].values[:4096],
+                self.train_dataset_df["Y"].values[:4096],
             )
         elif test > 1:
             return (
-                self.datasets["train"]["Gene"].values[:test],
-                self.datasets["train"]["Disease"].values[:test],
-                self.datasets["train"]["Y"].values[:test],
+                self.train_dataset_df["Gene"].values[:test],
+                self.train_dataset_df["Disease"].values[:test],
+                self.train_dataset_df["Y"].values[:test],
             )
         else:
-            return (
-                self.datasets["train"]["Gene"].values,
-                self.datasets["train"]["Disease"].values,
-                self.datasets["train"]["Y"].values,
-            )
+            return GDA_Dataset( (
+                self.train_dataset_df["Gene"].values,
+                self.train_dataset_df["Disease"].values,
+                self.train_dataset_df["Y"].values,
+            ))
 
     def get_dev_examples(self, test=False):
         """get validation examples
@@ -51,22 +74,22 @@ class DisGeNETProcessor:
         """
         if test == 1:  # Small testing set, to reduce the running time
             return (
-                self.datasets["valid"]["Gene"].values[:1024],
-                self.datasets["valid"]["Disease"].values[:1024],
-                self.datasets["valid"]["Y"].values[:1024],
+                self.val_dataset_df["Gene"].values[:1024],
+                self.val_dataset_df["Disease"].values[:1024],
+                self.val_dataset_df["Y"].values[:1024],
             )
         elif test > 1:
             return (
-                self.datasets["valid"]["Gene"].values[:test],
-                self.datasets["valid"]["Disease"].values[:test],
-                self.datasets["valid"]["Y"].values[:test],
+                self.val_dataset_df["Gene"].values[:test],
+                self.val_dataset_df["Disease"].values[:test],
+                self.val_dataset_df["Y"].values[:test],
             )
         else:
-            return (
-                self.datasets["valid"]["Gene"].values,
-                self.datasets["valid"]["Disease"].values,
-                self.datasets["valid"]["Y"].values,
-            )
+            return GDA_Dataset((
+                self.val_dataset_df["Gene"].values,
+                self.val_dataset_df["Disease"].values,
+                self.val_dataset_df["Y"].values,
+            ))
 
     def get_test_examples(self, test=False):
         """get test examples
@@ -79,22 +102,22 @@ class DisGeNETProcessor:
         """
         if test == 1:  # Small testing set, to reduce the running time
             return (
-                self.datasets["test"]["Gene"].values[:1024],
-                self.datasets["test"]["Disease"].values[:1024],
-                self.datasets["test"]["Y"].values[:1024],
+                self.test_dataset_df["Gene"].values[:1024],
+                self.test_dataset_df["Disease"].values[:1024],
+                self.test_dataset_df["Y"].values[:1024],
             )
         elif test > 1:
             return (
-                self.datasets["test"]["Gene"].values[:test],
-                self.datasets["test"]["Disease"].values[:test],
-                self.datasets["test"]["Y"].values[:test],
+                self.test_dataset_df["Gene"].values[:test],
+                self.test_dataset_df["Disease"].values[:test],
+                self.test_dataset_df["Y"].values[:test],
             )
         else:
-            return (
-                self.datasets["test"]["Gene"].values,
-                self.datasets["test"]["Disease"].values,
-                self.datasets["test"]["Y"].values,
-            )
+            return GDA_Dataset( (
+                self.test_dataset_df["Gene"].values,
+                self.test_dataset_df["Disease"].values,
+                self.test_dataset_df["Y"].values,
+            ))
 
 
 def convert_examples_to_tokens(
