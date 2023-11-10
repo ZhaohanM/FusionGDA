@@ -7,9 +7,10 @@
 
 ```bash
 pip install pytdc
-pip install pytorch-metric-learning
-pip install adapter-transformers
+pip install wandb
 pip install lightgbm
+pip install -U adapter-transformers
+pip install pytorch-metric-learning
 ```
 
 ## Executing program
