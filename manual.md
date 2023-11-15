@@ -4,7 +4,12 @@
 ## Data Format
 
 Pretraining data in the directory ~/dpa_pretrain/src/pretrain/data/pretrain/disgnet.csv
-Finetuning data is API, you can run it directly.
+
+
+Finetuning data Pretrain-Finetune in the directory ~/dpa_pretrain/src/data/downstream/
+
+
+Finetuning data TDC is API, you can run it directly.
 
 
 ## Model
@@ -28,4 +33,4 @@ In the directory ~/dpa_pretrain/src/scripts
 In the directory ~/dpa_pretrain/src/utils/metric_learning_models.py
 
 ## Model Evaluation
-ROC-AUC AUPR F1max
+ROC-AUC,AUPR,F1max,Accuracy
