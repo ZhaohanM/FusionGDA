@@ -11,7 +11,7 @@ Finetuning data is API, you can run it directly.
 
 ### You can check the structure of the model.
 
- Pretraining model in the directory ~/dpa_pretrain/src/pretrain
+ Pretraining model in the directory ~/dpa_pretrain/src/pretrain //
  Finetuning model in the directory ~/dpa_pretrain/src/finetune
 
 
