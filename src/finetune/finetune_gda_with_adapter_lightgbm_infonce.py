@@ -204,7 +204,7 @@ def encode_pretrained_feature(args, disGeNET):
         
         train_examples = disGeNET.get_train_examples(args.test)
         print(f"get training examples: {len(train_examples)}")
-        valid_examples = disGeNET.get_dev_examples(args.test)
+        valid_examples = disGeNET.get_val_examples(args.test)
         print(f"get validation examples: {len(valid_examples)}")
         test_examples = disGeNET.get_test_examples(args.test)
         print(f"get test examples: {len(test_examples)}")

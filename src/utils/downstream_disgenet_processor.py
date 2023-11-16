@@ -16,9 +16,11 @@ sys.path.append("../")
 class DisGeNETProcessor:
     def __init__(self, data_dir="/nfs/dpa_pretrain/data/downstream/"):
         data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/disgenet_finetune.csv')
-        # test_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/alzheimer_new.csv')
-        train_data, valid_data = train_test_split(data, test_size=0.3, random_state=42)
+        temp_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/alzheimer_new.csv')
+        # train_data, valid_data = train_test_split(data, test_size=0.3, random_state=42)
         valid_data, test_data = train_test_split(temp_data, test_size=1/3, random_state=42)
+        
+        # TDC dataset use [["Gene", "Disease", "Y"]].dropna()
         
         self.name = "DisGeNET"
         self.train_dataset_df = train_data[["proteinSeq", "diseaseDes", "score"]].dropna()
@@ -55,7 +57,7 @@ class DisGeNETProcessor:
                 self.train_dataset_df["score"].values,
             ))
 
-    def get_dev_examples(self, test=False):
+    def get_val_examples(self, test=False):
         """get validation examples
 
         Args:
@@ -84,7 +86,7 @@ class DisGeNETProcessor:
                 self.val_dataset_df["score"].values,
             ))
 
-     def get_test_examples(self, test=False):
+    def get_test_examples(self, test=False):
          """get test examples
 
          Args:
@@ -93,19 +95,19 @@ class DisGeNETProcessor:
          Returns:
              _type_: _description_
         """
-         if test == 1:  # Small testing set, to reduce the running time
+        if test == 1:  # Small testing set, to reduce the running time
              return (
                  self.test_dataset_df["proteinSeq"].values[:1024],
                  self.test_dataset_df["diseaseDes"].values[:1024],
                  self.test_dataset_df["score"].values[:1024],
              )
-         elif test > 1:
+        elif test > 1:
              return (
                  self.test_dataset_df["proteinSeq"].values[:test],
                  self.test_dataset_df["diseaseDes"].values[:test],
                  self.test_dataset_df["score"].values[:test],
              )
-         else:
+        else:
              return GDA_Dataset( (
                  self.test_dataset_df["proteinSeq"].values,
                  self.test_dataset_df["diseaseDes"].values,
