@@ -16,7 +16,7 @@ class DisGeNETProcessor:
         train_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/fold_1/train.csv')
         valid_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/fold_1/valid.csv')
         valid_data, test_data = train_test_split(valid_data, test_size=1/3, random_state=42)
-        # train_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/fold_1/disgenet_finetune.csv')
+        # train_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/disgenet_finetune.csv')
         # train_data, valid_data = train_test_split(data, test_size=0.3, random_state=42)
         
         # alzheimer and stomach dataset use [["proteinSeq", "diseaseDes", "Y"]].dropna()
