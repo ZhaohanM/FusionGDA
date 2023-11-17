@@ -1,0 +1,1 @@
+You must first run the pre-training script. Once the pre-training is complete, the model will be stored here.
