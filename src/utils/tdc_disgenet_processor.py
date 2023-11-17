@@ -11,14 +11,12 @@ sys.path.append("../")
 
 class DisGeNETProcessor:
     def __init__(self, data_dir="nfs/dpa_pretrain/data/downstream/"):
-        
-        data = GDA(name="TDC")  # , path=data_dir
-        data.binarize(threshold = 0.5, order = 'ascending')
-        data_df = data.balanced(oversample = True)
-        datasets_neg=data.neg_sample(frac = 1)
-        # Cold-Start Split: split = data.get_split(method = 'cold_split', column_name = ['Drug_ID', 'Cell Line_ID'])
-        self.datasets = data_neg.get_split(method = 'random', seed = 42, frac = [0.7, 0.1, 0.2])
-        self.name = "TDC"  
+
+        data = GDA(name="DisGeNET") # , path=data_dir
+        data.neg_sample(frac = 1)
+        data.binarize(threshold = 0, order = 'ascending')
+        self.datasets = data.get_split(method = 'random', seed = 42, frac = [0.7, 0.1, 0.2])
+        self.name = "TDC"
         
         self.train_dataset_df = self.datasets['train']
         self.train_dataset_df = self.train_dataset_df[
@@ -63,7 +61,7 @@ class DisGeNETProcessor:
                 self.train_dataset_df["Y"].values,
             ))
 
-    def get_dev_examples(self, test=False):
+    def get_val_examples(self, test=False):
         """get validation examples
 
         Args:
