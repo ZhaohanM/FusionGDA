@@ -8,19 +8,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 import numpy as np
 import pandas as pd
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
 sys.path.append("../")
 
 class DisGeNETProcessor:
     def __init__(self, data_dir="/nfs/dpa_pretrain/data/downstream/"):
-        data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/disgenet_finetune.csv')
-        temp_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/alzheimer_new.csv')
+        train_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/fold_1/train.csv')
+        valid_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/fold_1/valid.csv')
+        valid_data, test_data = train_test_split(valid_data, test_size=1/3, random_state=42)
+        # train_data = pd.read_csv('/nfs/dpa_pretrain/data/downstream/fold_1/disgenet_finetune.csv')
         # train_data, valid_data = train_test_split(data, test_size=0.3, random_state=42)
-        valid_data, test_data = train_test_split(temp_data, test_size=1/3, random_state=42)
         
-        # TDC dataset use [["Gene", "Disease", "Y"]].dropna()
+        # alzheimer and stomach dataset use [["proteinSeq", "diseaseDes", "Y"]].dropna()
         
         self.name = "DisGeNET"
         self.train_dataset_df = train_data[["proteinSeq", "diseaseDes", "score"]].dropna()
