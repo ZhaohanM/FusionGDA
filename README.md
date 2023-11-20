@@ -6,6 +6,19 @@
 
 
 ```bash
+# Anaconda installing
+RUN wget https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh
+RUN bash Anaconda3-2021.11-Linux-x86_64.sh -b
+RUN rm Anaconda3-2021.11-Linux-x86_64.sh
+
+# Set path to conda
+ENV PATH /root/anaconda3/bin:$PATH
+
+# Updating Anaconda packages
+RUN conda update conda
+
+# Install pytorch  pytorch-geometric
+RUN conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 pip install pytdc
 pip install wandb
 pip install lightgbm
