@@ -1,24 +1,31 @@
 # Heterogeneous biomedical entity representation learning for gene-disease association prediction
 
 
-## Installation
+## Installation environment
 
 
 
 ```bash
-# Anaconda installing
-RUN wget https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh
-RUN bash Anaconda3-2021.11-Linux-x86_64.sh -b
-RUN rm Anaconda3-2021.11-Linux-x86_64.sh
+# Download the latest Anaconda installer
+wget https://repo.anaconda.com/archive/Anaconda3-latest-Linux-x86_64.sh
+
+# Install Anaconda
+bash Anaconda3-latest-Linux-x86_64.sh -b
+
+# Clean up the installer to save space
+rm Anaconda3-latest-Linux-x86_64.sh
 
 # Set path to conda
 ENV PATH /root/anaconda3/bin:$PATH
 
 # Updating Anaconda packages
-RUN conda update conda
+conda update --all
 
-# Install pytorch  pytorch-geometric
+# Install the latest version of PyTorch and related libraries with CUDA support
+# Note: Replace 'cudatoolkit=x.x' with the version compatible with your CUDA version
 RUN conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+
+# Install other Python packages
 pip install pytdc
 pip install wandb
 pip install lightgbm
