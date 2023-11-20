@@ -29,7 +29,7 @@ bash run_finetune_gda_lightgbm_infoNCE.sh
 Check your results in the wandb account.
 
 ## Datasets
-We store all required datasets in the Google Drive. [Here]([https://www.openai.com/](https://drive.google.com/file/d/16O090S73EMqhhGfgwBiuTgz0zX1QY8Es/view?usp=share_link)https://drive.google.com/file/d/16O090S73EMqhhGfgwBiuTgz0zX1QY8Es/view?usp=share_link)
+We store all required datasets in the Google Drive. [Here](https://drive.google.com/file/d/16O090S73EMqhhGfgwBiuTgz0zX1QY8Es/view?usp=share_link)
 
 
 
