@@ -18,8 +18,18 @@ pip install pytorch-metric-learning
 Make sure you are in the directory ~/dpa_pretrain/scripts
 You adjust the required parameters directly.
 
-```bash
-bash <pretrain/finetune.sh>
+Pre-training phase
 ```
-
+bash run_pretrain_gda_ml_adapter_infoNCE.sh
+```
+Fine-tuning phase
+```
+bash run_finetune_gda_lightgbm_infoNCE.sh
+```
 Check your results in the wandb account.
+
+## Datasets
+We store all required datasets in the Google Drive. [here]([https://www.openai.com/](https://drive.google.com/file/d/16O090S73EMqhhGfgwBiuTgz0zX1QY8Es/view?usp=share_link)https://drive.google.com/file/d/16O090S73EMqhhGfgwBiuTgz0zX1QY8Es/view?usp=share_link)
+
+
+
