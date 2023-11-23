@@ -18,7 +18,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_recall_curve, f1_score, precision_recall_fscore_support,roc_auc_score
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
-from transformers import BertModel, BertTokenizer, AutoTokenizer, EsmModel, OPTForCausalLM
+from transformers import EsmTokenizer, EsmForMaskedLM, BertModel, BertTokenizer, AutoTokenizer, EsmModel
 from utils.tdc_disgenet_processor import DisGeNETProcessor
 from utils.metric_learning_models import GDA_Metric_Learning
 
@@ -39,7 +39,7 @@ def parse_config():
         "--prot_encoder_path",
         type=str,
         default="facebook/esm2_t33_650M_UR50D",     
-        "Rostlab/prot_bert" "facebook/esm1b_t33_650M_UR50S", Rostlab/prot_bert_bfd
+        "Rostlab/prot_bert" "facebook/esm1b_t33_650M_UR50S", "Rostlab/prot_bert_bfd"
         help="path/name of protein encoder model located",
     )
     parser.add_argument(
@@ -143,9 +143,9 @@ def encode_pretrained_feature(args, disGeNET):
         loaded = np.load(input_feat_file)
         x_train, y_train = loaded["x_train"], loaded["y_train"]
         x_valid, y_valid = loaded["x_valid"], loaded["y_valid"]
-        # x_test, y_test = loaded["x_test"], loaded["y_test"]
+        x_test, y_test = loaded["x_test"], loaded["y_test"]
     else:
-        prot_tokenizer = AutoTokenizer.from_pretrained(args.prot_encoder_path, do_lower_case=False)
+        prot_tokenizer = EsmTokenizer.from_pretrained(args.prot_encoder_path, do_lower_case=False)
         # prot_tokenizer = BertTokenizer.from_pretrained(args.prot_encoder_path, do_lower_case=False)
         print("prot_tokenizer", len(prot_tokenizer))
         disease_tokenizer = BertTokenizer.from_pretrained(args.disease_encoder_path)
@@ -244,8 +244,7 @@ def encode_pretrained_feature(args, disGeNET):
             # y_test=y_test,
         )
         print(f"save input feature into {input_feat_file}")
-    return x_train, y_train, x_valid, y_valid
-    # return x_train, y_train, x_valid, y_valid, x_test, y_test
+    return x_train, y_train, x_valid, y_valid, x_test, y_test
 
 
 def train(args):
