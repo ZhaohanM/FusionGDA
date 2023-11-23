@@ -16,7 +16,7 @@ from utils.metric_learning_models import GDA_Metric_Learning
 
 import wandb
 
-wandb.init(project="Nov_pretrain_gda_infoNCE_50Epoch")
+wandb.init(project="Nov_pretrain_gda_infoNCE_20Epoch")
 
 
 def parse_config():
@@ -51,7 +51,7 @@ def parse_config():
     )
     parser.add_argument("--prot_max_length", type=int, default=512)
     parser.add_argument("--disease_max_length", type=int, default=512)
-    parser.add_argument("--max_epoch", type=int, default=3)
+    parser.add_argument("--max_epoch", type=int, default=20)
     parser.add_argument("--max_step", type=int, default=sys.maxsize)
     parser.add_argument("--test", type=bool, default=False)
     parser.add_argument("--save_step", type=int, default=10000)
