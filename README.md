@@ -1,7 +1,7 @@
 # Heterogeneous biomedical entity representation learning for gene-disease association prediction
 
 
-## Installation environment
+## Installation
 
 
 
