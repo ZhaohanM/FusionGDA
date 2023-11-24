@@ -1,5 +1,6 @@
 # Heterogeneous biomedical entity representation learning for gene-disease association prediction
 
+[FusionGDA Architecture](/Figure/FusionGDA.pdf)
 
 ## Installation
 
