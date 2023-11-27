@@ -16,7 +16,7 @@ from utils.metric_learning_models import GDA_Metric_Learning
 
 import wandb
 
-wandb.init(project="Nov_pretrain_gda_infoNCE_20Epoch")
+wandb.init(project="Nov_pretrain_fusion_gda_infoNCE")
 
 
 def parse_config():
@@ -68,7 +68,7 @@ def parse_config():
     parser.add_argument(
         "--save_path_prefix",
         type=str,
-        default="../../save_model_ckp/pretrain/gda_infoNCE_20Epoch/",
+        default="../../save_model_ckp/pretrain/gda_infoNCE_fusion_esm/",
         help="save the result in which directory",
     )
     parser.add_argument("--seed", type=int, default=2022)
