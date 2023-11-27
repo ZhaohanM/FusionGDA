@@ -39,14 +39,11 @@ pip install pytorch-metric-learning
 Make sure you are in the directory ~/dpa_pretrain/scripts
 You adjust the required parameters directly.
 
-Pre-training phase
+###  Pre-training phase
 ```
 bash run_pretrain_gda_ml_adapter_infoNCE.sh
 ```
-Fine-tuning phase
-
-
-
+###  Fine-tuning phase
 TDC Dataset
 ```
 bash run_finetune_gda_lightgbm_infoNCE_tdc.sh
