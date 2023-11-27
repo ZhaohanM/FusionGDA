@@ -3,14 +3,14 @@ max_depth=6
 device='cuda:0'
 reduction_factor=8
 model_path_list=( 
-    "../../save_model_ckp/pretrain/gda_infoNCE_fusion_esm_2/reduction_factor_8_lr_0.00005" \
+    "../../save_model_ckp/pretrain/gda_infoNCE_fusion_esm" \
 )
 cd ../src/finetune/
 for save_model_path in ${model_path_list[@]};    
     do
     for lr in ${lr_list[@]}; 
         do   
-        for step in {1..9};
+        for step in {1..27};
             do
             num_leaves=$((2**($max_depth-1)))
             # cd ../src/finetune/ finetune_gda_lightgbm_infonce_cv.py
