@@ -8,7 +8,7 @@ gradient_accumulation_steps=128
 
 for lr in ${lr_list[@]}; 
 do
-    cd ../src/pretrain/; python pretrain_gda_infoNCE.py \
+    cd ../src/pretrain/; python pretrain_gda_ml_infoNCE.py \
         --device $device \
         --lr $lr \
         --batch_size $batch_size \
@@ -17,6 +17,6 @@ do
         --use_pooled \
         --save_step 100 \
         --warmup_steps 100 \
-        --max_epoch 50 \
+        --max_epoch 3 \
         --reduction_factor $reduction_factor
 done
