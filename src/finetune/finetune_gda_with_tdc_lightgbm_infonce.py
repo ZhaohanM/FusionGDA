@@ -57,7 +57,7 @@ def parse_config():
     parser.add_argument(
         "--input_feature_save_path",
         type=str,
-        default="../../data/processed_pooling",
+        default="../../data/processed_fusion_pooling_tdc",
         help="path of tokenized training data",
     )
     parser.add_argument(
@@ -90,7 +90,7 @@ def parse_config():
     parser.add_argument(
         "--save_path_prefix",
         type=str,
-        default="../../save_model_ckp/finetune/processed_infoNCE_fusion_tdc",
+        default="../../save_model_ckp/finetune/",
         help="save the result in which directory",
     )
     parser.add_argument(
