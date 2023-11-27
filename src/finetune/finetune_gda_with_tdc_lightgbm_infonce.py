@@ -90,7 +90,7 @@ def parse_config():
     parser.add_argument(
         "--save_path_prefix",
         type=str,
-        default="../../save_model_ckp/finetune/processed_infoNCE_fusion",
+        default="../../save_model_ckp/finetune/processed_infoNCE_fusion_tdc",
         help="save the result in which directory",
     )
     parser.add_argument(
