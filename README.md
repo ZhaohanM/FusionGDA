@@ -44,6 +44,9 @@ Pre-training phase
 bash run_pretrain_gda_ml_adapter_infoNCE.sh
 ```
 Fine-tuning phase
+
+
+
 TDC Dataset
 ```
 bash run_finetune_gda_lightgbm_infoNCE_tdc.sh
