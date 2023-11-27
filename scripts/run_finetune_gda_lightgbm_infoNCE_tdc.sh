@@ -13,8 +13,7 @@ for save_model_path in ${model_path_list[@]};
         for step in {1..27};
             do
             num_leaves=$((2**($max_depth-1)))
-            # cd ../src/finetune/ finetune_gda_lightgbm_infonce_cv.py
-            python finetune_gda_with_adapter_lightgbm_infonce_tdc.py \
+            python finetune_gda_with_tdc_lightgbm_infonce.py \
                     --save_model_path $save_model_path \
                     --device $device \
                     --batch_size 256 \
