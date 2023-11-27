@@ -39,7 +39,7 @@ def parse_config():
         "--prot_encoder_path",
         type=str,
         default="facebook/esm2_t33_650M_UR50D",     
-        "Rostlab/prot_bert" "facebook/esm1b_t33_650M_UR50S", Rostlab/prot_bert_bfd
+        "Rostlab/prot_bert" "facebook/esm1b_t33_650M_UR50S", "Rostlab/prot_bert_bfd"
         help="path/name of protein encoder model located",
     )
     parser.add_argument(
