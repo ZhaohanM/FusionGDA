@@ -239,8 +239,8 @@ def encode_pretrained_feature(args, disGeNET):
             y_train=y_train,
             x_valid=x_valid,
             y_valid=y_valid,
-            # x_test=x_test,
-            # y_test=y_test,
+            x_test=x_test,
+            y_test=y_test,
         )
         print(f"save input feature into {input_feat_file}")
     return x_train, y_train, x_valid, y_valid, x_test, y_test
