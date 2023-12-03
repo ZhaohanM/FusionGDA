@@ -10,7 +10,7 @@ sys.path.append("../")
 
 
 class DisGeNETProcessor:
-    def __init__(self, data_dir="nfs/dpa_pretrain/data/downstream/"):
+    def __init__(self, data_dir="nfs/FusionGDA/data/downstream/"):
 
         data = GDA(name="DisGeNET") # , path=data_dir
         data.neg_sample(frac = 1)
