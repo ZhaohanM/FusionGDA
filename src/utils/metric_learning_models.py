@@ -108,12 +108,12 @@ class GDA_Metric_Learning(GDANet):
         self.prot_pred_head = nn.Sequential(
             nn.Linear(disease_out_dim, disease_out_dim),
             nn.ReLU(),
-            nn.Linear(disease_out_dim, 30)  #vocabulary size : prot model tokenize length 30   446
+            nn.Linear(disease_out_dim, 1280)  #vocabulary size : prot model tokenize length 30   446
         )
         self.dise_pred_head = nn.Sequential(
             nn.Linear(disease_out_dim, disease_out_dim),
             nn.ReLU(),
-            nn.Linear(disease_out_dim, 30522) #vocabulary size : disease model tokenize length 30522
+            nn.Linear(disease_out_dim, 768) #vocabulary size : disease model tokenize length 30522
         )
         
         if self.use_miner:
