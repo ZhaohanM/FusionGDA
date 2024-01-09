@@ -99,35 +99,53 @@ def parse_config():
     return parser.parse_args()
 
 
-def get_feature(prot_model, disease_model, dataloader, args):
-    """convert tensors of dataloader to embedding feature encoded by berts
+# def get_feature(prot_model, disease_model, dataloader, args):
+#     """convert tensors of dataloader to embedding feature encoded by berts
 
-    Args:
-        prot_model (BertModel): Protein BERT model
-        disease_model (BertModel): Textual BERT model
-        dataloader (DataLoader): Dataloader
+#     Args:
+#         prot_model (BertModel): Protein BERT model
+#         disease_model (BertModel): Textual BERT model
+#         dataloader (DataLoader): Dataloader
 
-    Returns:
-        (ndarray,ndarray): x, y
-    """
+#     Returns:
+#         (ndarray,ndarray): x, y
+#     """
+#     x = list()
+#     y = list()
+#     with torch.no_grad():
+#         for step, batch in tqdm(enumerate(dataloader)):
+#             prot_input, disease_inputs, y1 = batch
+#             prot_input = prot_input.to(prot_model.device)
+#             disease_inputs = disease_inputs.to(disease_model.device)
+#             if args.use_pooled:
+#                 prot_out = prot_model(prot_input).last_hidden_state.mean(1)
+#                 disease_out = disease_model(disease_inputs,).last_hidden_state.mean(1)
+#             else:
+#                 prot_out = prot_model(prot_input).last_hidden_state[:, 0]
+#                 disease_out = disease_model(disease_inputs).last_hidden_state[:, 0]
+#             x1 = np.concatenate((prot_out.cpu(), disease_out.cpu()), axis=1)
+#             x.append(x1)
+#             y.append(y1.cpu().numpy())
+#     x = np.concatenate(x,axis=0)
+#     y = np.concatenate(y,axis=0)
+#     return x, y
+
+def get_feature(model, dataloader, args):
+    """ Fusion model: fused protein and disease embeddings """
+
     x = list()
     y = list()
     with torch.no_grad():
         for step, batch in tqdm(enumerate(dataloader)):
-            prot_input, disease_inputs, y1 = batch
-            prot_input = prot_input.to(prot_model.device)
-            disease_inputs = disease_inputs.to(disease_model.device)
-            if args.use_pooled:
-                prot_out = prot_model(prot_input).last_hidden_state.mean(1)
-                disease_out = disease_model(disease_inputs,).last_hidden_state.mean(1)
-            else:
-                prot_out = prot_model(prot_input).last_hidden_state[:, 0]
-                disease_out = disease_model(disease_inputs).last_hidden_state[:, 0]
-            x1 = np.concatenate((prot_out.cpu(), disease_out.cpu()), axis=1)
+            prot_input, drug_inputs, y1 = batch
+            prot_input = prot_input.to(args.device)
+            drug_inputs = drug_inputs.to(args.device)
+            feature_output = model.predict(prot_input, drug_inputs)
+            x1 = feature_output.cpu().numpy()
             x.append(x1)
             y.append(y1.cpu().numpy())
-    x = np.concatenate(x,axis=0)
-    y = np.concatenate(y,axis=0)
+    x = np.concatenate(x, axis=0)
+    y = np.concatenate(y, axis=0)
     return x, y
 
 
@@ -228,9 +246,13 @@ def encode_pretrained_feature(args, disGeNET):
         )
         print( f"dataset loaded: train-{len(train_examples)}; valid-{len(valid_examples)}; test-{len(test_examples)}")
 
-        x_train, y_train = get_feature(prot_model, disease_model, train_dataloader, args)
-        x_valid, y_valid = get_feature(prot_model, disease_model, valid_dataloader, args)
-        x_test, y_test = get_feature(prot_model, disease_model, test_dataloader, args)
+        # x_train, y_train = get_feature(prot_model, disease_model, train_dataloader, args)
+        # x_valid, y_valid = get_feature(prot_model, disease_model, valid_dataloader, args)
+        # x_test, y_test = get_feature(prot_model, disease_model, test_dataloader, args)
+        
+        x_train, y_train = get_feature(model, train_dataloader, args)
+        x_valid, y_valid = get_feature(model, valid_dataloader, args)
+        x_test, y_test = get_feature(model, test_dataloader, args)
 
         # Save input feature to reduce encoding time
         np.savez_compressed(
