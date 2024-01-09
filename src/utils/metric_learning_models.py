@@ -314,6 +314,9 @@ class GDA_Metric_Learning(GDANet):
         last_hidden_state1 = self.prot_encoder(
             query_toks1, return_dict=True
         ).last_hidden_state
+        last_hidden_state1 = self.prot_reg(
+            last_hidden_state1
+        )  # transform the prot embedding into the same dimension as the disease embedding
         last_hidden_state2 = self.disease_encoder(
             query_toks2, return_dict=True
         ).last_hidden_state
@@ -332,8 +335,8 @@ class GDA_Metric_Learning(GDANet):
         # dise_pred = self.dise_pred_head(dis_fused) # [12, 512, 768]
         
         if self.agg_mode == "cls":
-            query_embed1 = prot_pred[:, 0]  # query : [batch_size, hidden]
-            query_embed2 = dise_pred[:, 0]  # query : [batch_size, hidden]
+            query_embed1 = prot_fused[:, 0]  # query : [batch_size, hidden]
+            query_embed2 = dis_fused[:, 0]  # query : [batch_size, hidden]
         elif self.agg_mode == "mean_all_tok":
             query_embed1 = prot_fused.mean(1)  # query : [batch_size, hidden]
             query_embed2 = dis_fused.mean(1)  # query : [batch_size, hidden]
@@ -348,20 +351,12 @@ class GDA_Metric_Learning(GDANet):
             raise NotImplementedError()
 
         #print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
+        
         query_embed = torch.cat([query_embed1, query_embed2], dim=1)
         #print("query_embed =", query_embed.shape)
-  
-    
-        # MLP
-        if self.reg is not None:
-            x = self.reg(query_embed)
-            print("x_reg = ", len(x), x)
-            return x
-        if self.cls is not None:
-            x = self.cls(query_embed)
-            print("x_cls = ", len(x), x)
-            return x
 
+        return query_embed
+  
     def forward(self, query_toks1, query_toks2, labels):
         """
         query : (N, h), candidates : (N, topk, h)
