@@ -118,8 +118,12 @@ def train(args):
             return_tensors="pt",
         )
         scores = torch.tensor(list(scores))
-        return query_encodings1["input_ids"], query_encodings2["input_ids"], scores
-
+        attention_mask1 = query_encodings1["attention_mask"].bool()
+        attention_mask2 = query_encodings2["attention_mask"].bool()
+        
+        # return query_encodings1["input_ids"], query_encodings2["input_ids"], scores
+        return query_encodings1["input_ids"], attention_mask1, query_encodings2["input_ids"], attention_mask2, scores
+            
     wandb.config.update(args)
        
     # loading dataset
