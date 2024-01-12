@@ -75,6 +75,66 @@ class FusionModule(nn.Module):
         
         return protein_fused, dis_fused
 
+class CrossAttentionBlock(nn.Module):
+
+    def __init__(self, hidden_dim, num_heads):
+        super(CrossAttentionBlock, self).__init__()
+        if hidden_dim % num_heads != 0:
+            raise ValueError(
+                "The hidden size (%d) is not a multiple of the number of attention "
+                "heads (%d)" % (hidden_dim, num_heads))
+        self.hidden_dim = hidden_dim
+        self.num_heads = num_heads
+        self.head_size = hidden_dim // num_heads
+
+        self.query1 = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.key1 = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.value1 = nn.Linear(hidden_dim, hidden_dim, bias=False)
+
+        self.query2 = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.key2 = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.value2 = nn.Linear(hidden_dim, hidden_dim, bias=False)
+
+    def _alpha_from_logits(self, logits, mask_row, mask_col, inf=1e6):
+        N, L1, L2, H = logits.shape
+        mask_row = mask_row.view(N, L1, 1).repeat(1, 1, H)
+        mask_col = mask_col.view(N, L2, 1).repeat(1, 1, H)
+        mask_pair = torch.einsum('blh, bkh->blkh', mask_row, mask_col)
+
+        logits = torch.where(mask_pair, logits, logits - inf)
+        alpha = torch.softmax(logits, dim=2)
+        mask_row = mask_row.view(N, L1, 1, H).repeat(1, 1, L2, 1)
+        alpha = torch.where(mask_row, alpha, torch.zeros_like(alpha))
+        return alpha
+
+    def _heads(self, x, n_heads, n_ch):
+        s = list(x.size())[:-1] + [n_heads, n_ch]
+        return x.view(*s)
+
+    def forward(self, input1, input2, mask1, mask2):
+        query1 = self._heads(self.query1(input1), self.num_heads, self.head_size)
+        key1 = self._heads(self.key1(input1), self.num_heads, self.head_size)
+        query2 = self._heads(self.query2(input2), self.num_heads, self.head_size)
+        key2 = self._heads(self.key2(input2), self.num_heads, self.head_size)
+        logits11 = torch.einsum('blhd, bkhd->blkh', query1, key1)
+        logits12 = torch.einsum('blhd, bkhd->blkh', query1, key2)
+        logits21 = torch.einsum('blhd, bkhd->blkh', query2, key1)
+        logits22 = torch.einsum('blhd, bkhd->blkh', query2, key2)
+
+        alpha11 = self._alpha_from_logits(logits11, mask1, mask1)
+        alpha12 = self._alpha_from_logits(logits12, mask1, mask2)
+        alpha21 = self._alpha_from_logits(logits21, mask2, mask1)
+        alpha22 = self._alpha_from_logits(logits22, mask2, mask2)
+
+        value1 = self._heads(self.value1(input1), self.num_heads, self.head_size)
+        value2 = self._heads(self.value2(input2), self.num_heads, self.head_size)
+        output1 = (torch.einsum('blkh, bkhd->blhd', alpha11, value1).flatten(-2) +
+                   torch.einsum('blkh, bkhd->blhd', alpha12, value2).flatten(-2)) / 2
+        output2 = (torch.einsum('blkh, bkhd->blhd', alpha21, value1).flatten(-2) +
+                   torch.einsum('blkh, bkhd->blhd', alpha22, value2).flatten(-2)) / 2
+
+        return output1, output2
+
 class GDA_Metric_Learning(GDANet):
     def __init__(
             self, prot_encoder, disease_encoder, prot_out_dim, disease_out_dim, args
@@ -104,7 +164,8 @@ class GDA_Metric_Learning(GDANet):
         self.prot_adapter_name = None
         self.disease_adapter_name = None
         
-        self.fusion_layer = FusionModule(disease_out_dim, num_head=8)
+        self.fusion_layer = FusionModule(1024, num_head=8)
+        self.cross_attention_layer = CrossAttentionBlock(1024, 8)
         
         # MMP Prediction Heads
         self.prot_pred_head = nn.Sequential(
@@ -313,33 +374,44 @@ class GDA_Metric_Learning(GDANet):
         query : (N, h), candidates : (N, topk, h)
         output : (N, topk)
         """
+        # Extract input_ids and attention_mask for protein
+        prot_input_ids = query_toks1["input_ids"]
+        prot_attention_mask = query_toks1["attention_mask"]
+
+        # Extract input_ids and attention_mask for drug
+        drug_input_ids = query_toks2["input_ids"]
+        drug_attention_mask = query_toks2["attention_mask"]
+
+        # Process inputs through encoders
         last_hidden_state1 = self.prot_encoder(
-            query_toks1, return_dict=True
+            input_ids=prot_input_ids, attention_mask=prot_attention_mask, return_dict=True
+        ).logits
+        last_hidden_state1 = self.prot_reg(last_hidden_state1)
+
+        last_hidden_state2 = self.drug_encoder(
+            input_ids=drug_input_ids, attention_mask=drug_attention_mask, return_dict=True
         ).last_hidden_state
-        last_hidden_state1 = self.prot_reg(
-            last_hidden_state1
-        )  # transform the prot embedding into the same dimension as the disease embedding
-        last_hidden_state2 = self.disease_encoder(
-            query_toks2, return_dict=True
-        ).last_hidden_state
-        last_hidden_state2 = self.dis_reg(
-            last_hidden_state2
-        )  # transform the disease embedding into 1024
-        
-        #print("last_hidden_state2 =", last_hidden_state2.shape)  
-        #print("last_hidden_state1 =", last_hidden_state1.shape)
+        last_hidden_state2 = self.drug_reg(last_hidden_state2)
+       # Apply the cross-attention layer
+        prot_fused, drug_fused = self.cross_attention_layer(
+            last_hidden_state1, last_hidden_state2, prot_attention_mask, drug_attention_mask
+        )
+
+        # last_hidden_state1 = self.prot_encoder(
+        #     query_toks1, return_dict=True
+        # ).last_hidden_state
+        # last_hidden_state1 = self.prot_reg(
+        #     last_hidden_state1
+        # )  # transform the prot embedding into the same dimension as the disease embedding
+        # last_hidden_state2 = self.disease_encoder(
+        #     query_toks2, return_dict=True
+        # ).last_hidden_state
+        # last_hidden_state2 = self.dis_reg(
+        #     last_hidden_state2
+        # )  # transform the disease embedding into 1024
         
        # Apply the fusion layer and Recovery of representational shape
-        prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
-        
-        # print("prot_fused1 :", prot_fused1.shape) 
-        # prot_fused = prot_fused1.permute(1, 0, 2)
-        # dis_fused = dis_fused1.permute(1, 0, 2)
-        # print("prot_fused :", prot_fused.shape)
-        
-        # Multi-modal Mask Prediction (MMP)
-        # prot_pred = self.prot_pred_head(prot_fused) # [12, 512, 768]
-        # dise_pred = self.dise_pred_head(dis_fused) # [12, 512, 768]
+       # prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
         
         if self.agg_mode == "cls":
             query_embed1 = prot_fused[:, 0]  # query : [batch_size, hidden]
@@ -356,12 +428,8 @@ class GDA_Metric_Learning(GDANet):
                            ).sum(1) / query_toks2["attention_mask"].sum(-1).unsqueeze(-1)
         else:
             raise NotImplementedError()
-
-        # print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
         
         query_embed = torch.cat([query_embed1, query_embed2], dim=1)
-        # print("query_embed =", query_embed.shape)
-
         return query_embed
   
     def forward(self, query_toks1, query_toks2, labels):
