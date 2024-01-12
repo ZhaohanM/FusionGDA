@@ -99,11 +99,14 @@ class GDA_Metric_Learning(GDANet):
         self.use_miner = args.use_miner
         self.miner_margin = args.miner_margin
         self.agg_mode = args.agg_mode
-        self.prot_reg = nn.Linear(prot_out_dim, disease_out_dim)
+        self.prot_reg = nn.Linear(prot_out_dim, 1024)
+        # self.prot_reg = nn.Linear(prot_out_dim, disease_out_dim)
+        self.dis_reg = nn.Linear(disease_out_dim, 1024)
         self.prot_adapter_name = None
         self.disease_adapter_name = None
         
         self.fusion_layer = FusionModule(disease_out_dim, num_head=8)
+        
         # MMP Prediction Heads
         self.prot_pred_head = nn.Sequential(
             nn.Linear(disease_out_dim, disease_out_dim),
@@ -320,15 +323,20 @@ class GDA_Metric_Learning(GDANet):
         last_hidden_state2 = self.disease_encoder(
             query_toks2, return_dict=True
         ).last_hidden_state
+        last_hidden_state2 = self.dis_reg(
+            last_hidden_state2
+        )  # transform the disease embedding into 1024
+        
         #print("last_hidden_state2 =", last_hidden_state2.shape)  
         #print("last_hidden_state1 =", last_hidden_state1.shape)
         
        # Apply the fusion layer and Recovery of representational shape
-        prot_fused1, dis_fused1 = self.fusion_layer(last_hidden_state1, last_hidden_state2)
+        prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
+        
         # print("prot_fused1 :", prot_fused1.shape) 
-        prot_fused = prot_fused1.permute(1, 0, 2)
-        dis_fused = dis_fused1.permute(1, 0, 2)
-        #print("prot_fused :", prot_fused.shape)
+        # prot_fused = prot_fused1.permute(1, 0, 2)
+        # dis_fused = dis_fused1.permute(1, 0, 2)
+        # print("prot_fused :", prot_fused.shape)
         
         # Multi-modal Mask Prediction (MMP)
         # prot_pred = self.prot_pred_head(prot_fused) # [12, 512, 768]
@@ -350,10 +358,10 @@ class GDA_Metric_Learning(GDANet):
         else:
             raise NotImplementedError()
 
-        #print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
+        # print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
         
         query_embed = torch.cat([query_embed1, query_embed2], dim=1)
-        #print("query_embed =", query_embed.shape)
+        # print("query_embed =", query_embed.shape)
 
         return query_embed
   
@@ -372,13 +380,17 @@ class GDA_Metric_Learning(GDANet):
         last_hidden_state2 = self.disease_encoder(
             query_toks2, return_dict=True
         ).last_hidden_state
+        last_hidden_state2 = self.dis_reg(
+            last_hidden_state2
+        )  # transform the disease embedding into 1024
         
        # Apply the fusion layer and Recovery of representational shape
-        prot_fused1, dis_fused1 = self.fusion_layer(last_hidden_state1, last_hidden_state2)
-        #print("prot_fused1 :", prot_fused1.shape) 
-        prot_fused = prot_fused1.permute(1, 0, 2)
-        dis_fused = dis_fused1.permute(1, 0, 2)
-       # print("prot_fused :", prot_fused.shape)
+        prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
+        
+        # print("prot_fused1 :", prot_fused1.shape) 
+        # prot_fused = prot_fused1.permute(1, 0, 2)
+        # dis_fused = dis_fused1.permute(1, 0, 2)
+        # print("prot_fused :", prot_fused.shape)
 
        # Multi-modal Mask Prediction (MMP)
         # prot_pred = self.prot_pred_head(prot_fused) # [12, 512, 768]
@@ -402,7 +414,7 @@ class GDA_Metric_Learning(GDANet):
         else:
             raise NotImplementedError()
 
-        #print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
+        # print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
         # print("query_embed =", len(query_embed))
         labels = torch.cat([torch.arange(len(labels)), torch.arange(len(labels))], dim=0)
