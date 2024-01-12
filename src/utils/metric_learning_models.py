@@ -437,34 +437,44 @@ class GDA_Metric_Learning(GDANet):
         query : (N, h), candidates : (N, topk, h)
         output : (N, topk)
         """
+        # Extract input_ids and attention_mask for protein
+        prot_input_ids = query_toks1["input_ids"]
+        prot_attention_mask = query_toks1["attention_mask"]
+
+        # Extract input_ids and attention_mask for dis
+        dis_input_ids = query_toks2["input_ids"]
+        dis_attention_mask = query_toks2["attention_mask"]
+
+        # Process inputs through encoders
         last_hidden_state1 = self.prot_encoder(
-            query_toks1, return_dict=True
-        ).last_hidden_state
-        
-        last_hidden_state1 = self.prot_reg(
-            last_hidden_state1
-        )  # transform the prot embedding into the same dimension as the disease embedding
-        last_hidden_state2 = self.disease_encoder(
-            query_toks2, return_dict=True
-        ).last_hidden_state
-        last_hidden_state2 = self.dis_reg(
-            last_hidden_state2
-        )  # transform the disease embedding into 1024
-        
-       # Apply the fusion layer and Recovery of representational shape
-        prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
-        
-        # print("prot_fused1 :", prot_fused1.shape) 
-        # prot_fused = prot_fused1.permute(1, 0, 2)
-        # dis_fused = dis_fused1.permute(1, 0, 2)
-        # print("prot_fused :", prot_fused.shape)
+            input_ids=prot_input_ids, attention_mask=prot_attention_mask, return_dict=True
+        ).logits
+        last_hidden_state1 = self.prot_reg(last_hidden_state1)
 
-       # Multi-modal Mask Prediction (MMP)
-        # prot_pred = self.prot_pred_head(prot_fused) # [12, 512, 768]
-        # dise_pred = self.dise_pred_head(dis_fused) # [12, 512, 768]
-        # print("prot_pred:", prot_pred.shape)
-        # print("dise_pred:", dise_pred.shape)
-
+        last_hidden_state2 = self.dis_encoder(
+            input_ids=dis_input_ids, attention_mask=dis_attention_mask, return_dict=True
+        ).last_hidden_state
+        last_hidden_state2 = self.dis_reg(last_hidden_state2)
+       # Apply the cross-attention layer
+        prot_fused, dis_fused = self.cross_attention_layer(
+            last_hidden_state1, last_hidden_state2, prot_attention_mask, dis_attention_mask
+        )
+       #  last_hidden_state1 = self.prot_encoder(
+       #      query_toks1, return_dict=True
+       #  ).last_hidden_state
+        
+       #  last_hidden_state1 = self.prot_reg(
+       #      last_hidden_state1
+       #  )  # transform the prot embedding into the same dimension as the disease embedding
+       #  last_hidden_state2 = self.disease_encoder(
+       #      query_toks2, return_dict=True
+       #  ).last_hidden_state
+       #  last_hidden_state2 = self.dis_reg(
+       #      last_hidden_state2
+       #  )  # transform the disease embedding into 1024
+        
+       # # Apply the fusion layer and Recovery of representational shape
+       #  prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
         if self.agg_mode == "cls":
             query_embed1 = prot_pred[:, 0]  # query : [batch_size, hidden]
             query_embed2 = dise_pred[:, 0]  # query : [batch_size, hidden]
@@ -484,8 +494,8 @@ class GDA_Metric_Learning(GDANet):
         # print("query_embed1 =", query_embed1.shape, "query_embed2 =", query_embed2.shape)
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
         # print("query_embed =", len(query_embed))
+        
         labels = torch.cat([torch.arange(len(labels)), torch.arange(len(labels))], dim=0)
-        # print("lable =", len(labels), labels)
         
         if self.use_miner:
             hard_pairs = self.miner(query_embed, labels)
