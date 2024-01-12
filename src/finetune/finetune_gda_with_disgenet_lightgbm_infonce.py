@@ -131,24 +131,31 @@ def parse_config():
 #     return x, y
 
 def get_feature(model, dataloader, args):
-    """ Fusion model: fused protein and disease embeddings """
-
     x = list()
     y = list()
     with torch.no_grad():
         for step, batch in tqdm(enumerate(dataloader)):
-            prot_input, drug_inputs, y1 = batch
-            prot_input = prot_input.to(args.device)
-            drug_inputs = drug_inputs.to(args.device)
-            feature_output = model.predict(prot_input, drug_inputs)
+            prot_input_ids, prot_attention_mask, drug_input_ids, drug_attention_mask, y1 = batch
+            # prot_input = prot_input.to(args.device)
+            # drug_inputs = drug_inputs.to(args.device)
+            
+            # Prepare inputs as dictionaries
+            prot_input = {
+                'input_ids': prot_input_ids.to(args.device), 
+                'attention_mask': prot_attention_mask.to(args.device)
+            }
+            drug_input = {
+                'input_ids': drug_input_ids.to(args.device), 
+                'attention_mask': drug_attention_mask.to(args.device)
+            }
+            feature_output = model.predict(prot_input, drug_input)
             x1 = feature_output.cpu().numpy()
             x.append(x1)
             y.append(y1.cpu().numpy())
     x = np.concatenate(x, axis=0)
     y = np.concatenate(y, axis=0)
     return x, y
-
-
+    
 def encode_pretrained_feature(args, disGeNET):
     input_feat_file = os.path.join(
         args.input_feature_save_path,
@@ -217,7 +224,10 @@ def encode_pretrained_feature(args, disGeNET):
                 return_tensors="pt",
             )
             scores = torch.tensor(list(scores))
-            return query_encodings1["input_ids"], query_encodings2["input_ids"], scores
+            attention_mask1 = query_encodings1["attention_mask"].bool()
+            attention_mask2 = query_encodings2["attention_mask"].bool()
+            
+            return query_encodings1["input_ids"], attention_mask1, query_encodings2["input_ids"], attention_mask2, scores
         
         train_examples = disGeNET.get_train_examples(args.test)
         print(f"get training examples: {len(train_examples)}")
