@@ -378,9 +378,9 @@ class GDA_Metric_Learning(GDANet):
         prot_input_ids = query_toks1["input_ids"]
         prot_attention_mask = query_toks1["attention_mask"]
 
-        # Extract input_ids and attention_mask for drug
-        drug_input_ids = query_toks2["input_ids"]
-        drug_attention_mask = query_toks2["attention_mask"]
+        # Extract input_ids and attention_mask for dis
+        dis_input_ids = query_toks2["input_ids"]
+        dis_attention_mask = query_toks2["attention_mask"]
 
         # Process inputs through encoders
         last_hidden_state1 = self.prot_encoder(
@@ -388,13 +388,13 @@ class GDA_Metric_Learning(GDANet):
         ).logits
         last_hidden_state1 = self.prot_reg(last_hidden_state1)
 
-        last_hidden_state2 = self.drug_encoder(
-            input_ids=drug_input_ids, attention_mask=drug_attention_mask, return_dict=True
+        last_hidden_state2 = self.dis_encoder(
+            input_ids=dis_input_ids, attention_mask=dis_attention_mask, return_dict=True
         ).last_hidden_state
-        last_hidden_state2 = self.drug_reg(last_hidden_state2)
+        last_hidden_state2 = self.dis_reg(last_hidden_state2)
        # Apply the cross-attention layer
-        prot_fused, drug_fused = self.cross_attention_layer(
-            last_hidden_state1, last_hidden_state2, prot_attention_mask, drug_attention_mask
+        prot_fused, dis_fused = self.cross_attention_layer(
+            last_hidden_state1, last_hidden_state2, prot_attention_mask, dis_attention_mask
         )
 
         # last_hidden_state1 = self.prot_encoder(
