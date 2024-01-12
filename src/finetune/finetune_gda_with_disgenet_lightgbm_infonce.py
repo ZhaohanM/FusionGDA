@@ -135,20 +135,20 @@ def get_feature(model, dataloader, args):
     y = list()
     with torch.no_grad():
         for step, batch in tqdm(enumerate(dataloader)):
-            prot_input_ids, prot_attention_mask, drug_input_ids, drug_attention_mask, y1 = batch
+            prot_input_ids, prot_attention_mask, dis_input_ids, dis_attention_mask, y1 = batch
             # prot_input = prot_input.to(args.device)
-            # drug_inputs = drug_inputs.to(args.device)
+            # dis_inputs = dis_inputs.to(args.device)
             
             # Prepare inputs as dictionaries
             prot_input = {
                 'input_ids': prot_input_ids.to(args.device), 
                 'attention_mask': prot_attention_mask.to(args.device)
             }
-            drug_input = {
-                'input_ids': drug_input_ids.to(args.device), 
-                'attention_mask': drug_attention_mask.to(args.device)
+            dis_input = {
+                'input_ids': dis_input_ids.to(args.device), 
+                'attention_mask': dis_attention_mask.to(args.device)
             }
-            feature_output = model.predict(prot_input, drug_input)
+            feature_output = model.predict(prot_input, dis_input)
             x1 = feature_output.cpu().numpy()
             x.append(x1)
             y.append(y1.cpu().numpy())
