@@ -50,10 +50,10 @@ class FusionModule(nn.Module):
         self.WvT = nn.Linear(out_dim, out_dim)
         self.multi_head_attention = nn.MultiheadAttention(out_dim, num_head, dropout=dropout)
 
-    def forward(self, protein_representation, disease_representation):
+    def forward(self, zs, zt):
         #  nn.MultiheadAttention The input representation is (token_length, batch_size, out_dim)
-        zs = protein_representation.permute(1, 0, 2)
-        zt = disease_representation.permute(1, 0, 2)   
+        # zs = protein_representation.permute(1, 0, 2)
+        # zt = disease_representation.permute(1, 0, 2)   
         
         # Compute query, key and value representations
         qs = self.WqS(zs)
@@ -73,7 +73,6 @@ class FusionModule(nn.Module):
         protein_fused = 0.5 * (zs_attention1 + zs_attention2)
         dis_fused = 0.5 * (zt_attention1 + zt_attention2)
         
-        #print("protein_fused",protein_fused.shape,"dis_fused",dis_fused.shape)
         return protein_fused, dis_fused
 
 class GDA_Metric_Learning(GDANet):
