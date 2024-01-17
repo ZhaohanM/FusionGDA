@@ -16,12 +16,11 @@ from pytorch_metric_learning import losses, miners
 from torch.cuda.amp import autocast
 from torch.nn import Module
 from tqdm import tqdm
-from transformers import AdapterConfig
 from transformers.adapters.composition import Fuse, Stack
 from utils.gd_model import GDANet
 from torch.nn import MultiheadAttention
 
-from transformers import AdapterConfig, AdapterType, BertModel
+from transformers import BertModel
 from transformers import EsmModel, EsmConfig
 from transformers.adapters.model_mixin import ModelWithHeadsAdaptersMixin
 
