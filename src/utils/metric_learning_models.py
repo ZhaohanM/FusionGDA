@@ -384,7 +384,7 @@ class GDA_Metric_Learning(GDANet):
         # Process inputs through encoders
         last_hidden_state1 = self.prot_encoder(
             input_ids=prot_input_ids, attention_mask=prot_attention_mask, return_dict=True
-        ).logits
+        ).last_hidden_state
         last_hidden_state1 = self.prot_reg(last_hidden_state1)
 
         last_hidden_state2 = self.dis_encoder(
@@ -447,7 +447,7 @@ class GDA_Metric_Learning(GDANet):
         # Process inputs through encoders
         last_hidden_state1 = self.prot_encoder(
             input_ids=prot_input_ids, attention_mask=prot_attention_mask, return_dict=True
-        ).logits
+        ).last_hidden_state
         last_hidden_state1 = self.prot_reg(last_hidden_state1)
 
         last_hidden_state2 = self.dis_encoder(
