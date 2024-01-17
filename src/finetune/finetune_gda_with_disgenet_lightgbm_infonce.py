@@ -135,10 +135,7 @@ def get_feature(model, dataloader, args):
     y = list()
     with torch.no_grad():
         for step, batch in tqdm(enumerate(dataloader)):
-            prot_input_ids, prot_attention_mask, dis_input_ids, dis_attention_mask, y1 = batch
-            # prot_input = prot_input.to(args.device)
-            # dis_inputs = dis_inputs.to(args.device)
-            
+            prot_input_ids, prot_attention_mask, dis_input_ids, dis_attention_mask, y1 = batch    
             # Prepare inputs as dictionaries
             prot_input = {
                 'input_ids': prot_input_ids.to(args.device), 
