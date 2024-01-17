@@ -387,7 +387,7 @@ class GDA_Metric_Learning(GDANet):
         ).last_hidden_state
         last_hidden_state1 = self.prot_reg(last_hidden_state1)
 
-        last_hidden_state2 = self.dis_encoder(
+        last_hidden_state2 = self.disease_encoder(
             input_ids=dis_input_ids, attention_mask=dis_attention_mask, return_dict=True
         ).last_hidden_state
         last_hidden_state2 = self.dis_reg(last_hidden_state2)
@@ -450,7 +450,7 @@ class GDA_Metric_Learning(GDANet):
         ).last_hidden_state
         last_hidden_state1 = self.prot_reg(last_hidden_state1)
 
-        last_hidden_state2 = self.dis_encoder(
+        last_hidden_state2 = self.disease_encoder(
             input_ids=dis_input_ids, attention_mask=dis_attention_mask, return_dict=True
         ).last_hidden_state
         last_hidden_state2 = self.dis_reg(last_hidden_state2)
