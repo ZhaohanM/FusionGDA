@@ -162,10 +162,19 @@ def train(args):
         model.train()
         t_loss = 0
         for step, batch in enumerate(train_dataloader):
-            prot_inputs, disease_inputs, label_inputs = batch
-            prot_inputs = prot_inputs.to(args.device)
-            disease_inputs = disease_inputs.to(args.device)
-            label_inputs = label_inputs.to(args.device)
+            prot_input_ids, prot_attention_mask, dis_input_ids, dis_attention_mask, label = batch
+            prot_inputs = {
+                'input_ids': prot_input_ids.to(args.device), 
+                'attention_mask': prot_attention_mask.to(args.device)
+            }
+            disease_inputs = {
+                'input_ids': dis_input_ids.to(args.device), 
+                'attention_mask': dis_attention_mask.to(args.device)
+            }
+            label_inputs = label.to(args.device)
+            optimizer.zero_grad()
+
+            loss = model(prot_inputs, disease_inputs, label_inputs)
             optimizer.zero_grad()
 
             loss = model(prot_inputs, disease_inputs, label_inputs)
