@@ -39,7 +39,7 @@ class GDA_Pretrain_Dataset(Dataset):
 
     def __init__(self, data_dir="../../data/pretrain/", test=False):
         LOGGER.info("Initializing GDA Pretraining Dataset ! ...")
-        self.dataset_df = pd.read_csv(f"{data_dir}/disgenet_pretrain.csv")
+        self.dataset_df = pd.read_csv(f"{data_dir}/DisGeNET-PT.csv")
         self.dataset_df = self.dataset_df[
             ["proteinSeq", "diseaseDes", "score"]
         ].dropna()  # Drop missing values.
