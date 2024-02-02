@@ -5,7 +5,6 @@ import torch
 from tdc.multi_pred import GDA
 from utils.data_loader import GDA_Dataset
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
 import numpy as np
 import pandas as pd
 
@@ -13,20 +12,20 @@ sys.path.append("../")
 
 class DisGeNETProcessor:
     def __init__(self, data_dir="/nfs/FusionGDA/data/downstream/"):
-        # train_data = pd.read_csv('/nfs/FusionGDA/data/downstream/fold_1/train.csv')
-        # valid_data = pd.read_csv('/nfs/FusionGDA/data/downstream/fold_1/valid.csv')
-        # valid_data, test_data = train_test_split(valid_data, test_size=1/3, random_state=42)
-        train_data = pd.read_csv('/nfs/FusionGDA/data/downstream/disgenet_finetune.csv')
+        # train_data = pd.read_csv('/nfs/FusionGDA/data/downstream/fold_1_train.csv')
+        # valid_data = pd.read_csv('/nfs/FusionGDA/data/downstream/fold_1_valid.csv')
+        # test_data = pd.read_csv('/nfs/FusionGDA/data/downstream/fold_1_test.csv')
+        train_data = pd.read_csv('/nfs/FusionGDA/data/downstream/DisGeNET-EVAL.csv')
         train_data, valid_data = train_test_split(train_data, test_size=0.3, random_state=42)
         valid_data, test_data = train_test_split(valid_data, test_size=1/3, random_state=42)
         
-        # alzheimer and stomach dataset use [["proteinSeq", "diseaseDes", "Y"]].dropna()
+        # alzheimer and stomach dataset use [["proteinSeq", "diseaseDes", "score"]].dropna()
         
         self.name = "DisGeNET"
         self.train_dataset_df = train_data[["proteinSeq", "diseaseDes", "score"]].dropna()
         self.val_dataset_df = valid_data[["proteinSeq", "diseaseDes", "score"]].dropna()
         self.test_dataset_df = test_data[["proteinSeq", "diseaseDes", "score"]].dropna()
-        # self.test_dataset_df = test_data[["proteinSeq", "diseaseDes", "Y"]].dropna()
+        # self.test_dataset_df = test_data[["proteinSeq", "diseaseDes", "score"]].dropna()
 
         
     def get_train_examples(self, test=False):
