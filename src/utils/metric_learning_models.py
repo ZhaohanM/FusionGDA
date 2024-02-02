@@ -25,63 +25,11 @@ from transformers import EsmModel, EsmConfig
 from transformers.adapters.model_mixin import ModelWithHeadsAdaptersMixin
 
 LOGGER = logging.getLogger(__name__)
-    
+
 class FusionModule(nn.Module):
-    def __init__(self, out_dim, num_head, dropout= 0.1):
-        super(FusionModule, self).__init__()
-        """FusionModule.
-
-        Args:
-            dropout= 0.1 is defaut
-            out_dim: model output dimension
-            num_head = 8: Multi-head Attention
-        """
-
-        self.out_dim = out_dim
-        self.num_head = num_head
-
-        self.WqS = nn.Linear(out_dim, out_dim)
-        self.WkS = nn.Linear(out_dim, out_dim)
-        self.WvS = nn.Linear(out_dim, out_dim)
-
-        self.WqT = nn.Linear(out_dim, out_dim)
-        self.WkT = nn.Linear(out_dim, out_dim)
-        self.WvT = nn.Linear(out_dim, out_dim)
-        self.multi_head_attention = nn.MultiheadAttention(out_dim, num_head, dropout=dropout)
-
-    def forward(self, zs, zt):
-        #  nn.MultiheadAttention The input representation is (token_length, batch_size, out_dim)
-        # zs = protein_representation.permute(1, 0, 2)
-        # zt = disease_representation.permute(1, 0, 2)   
-        
-        # Compute query, key and value representations
-        qs = self.WqS(zs)
-        ks = self.WkS(zs)
-        vs = self.WvS(zs)
-
-        qt = self.WqT(zt)
-        kt = self.WkT(zt)
-        vt = self.WvT(zt)
-        
-        #self.multi_head_attention() The function returns two values: the representation and the attention weight matrix, computed after multiple attentions. In this case, we only care about the computed representation and not the attention weight matrix, so "_" is used to indicate that we do not intend to use or store the second return value.
-        zs_attention1, _ = self.multi_head_attention(qs, ks, vs)
-        zs_attention2, _ = self.multi_head_attention(qs, kt, vt)
-        zt_attention1, _ = self.multi_head_attention(qt, kt, vt)
-        zt_attention2, _ = self.multi_head_attention(qt, ks, vs)
-
-        protein_fused = 0.5 * (zs_attention1 + zs_attention2)
-        dis_fused = 0.5 * (zt_attention1 + zt_attention2)
-        
-        return protein_fused, dis_fused
-
-class CrossAttentionBlock(nn.Module):
 
     def __init__(self, hidden_dim, num_heads):
-        super(CrossAttentionBlock, self).__init__()
-        if hidden_dim % num_heads != 0:
-            raise ValueError(
-                "The hidden size (%d) is not a multiple of the number of attention "
-                "heads (%d)" % (hidden_dim, num_heads))
+        super(FusionModule, self).__init__()
         self.hidden_dim = hidden_dim
         self.num_heads = num_heads
         self.head_size = hidden_dim // num_heads
@@ -164,19 +112,6 @@ class GDA_Metric_Learning(GDANet):
         self.disease_adapter_name = None
         
         self.fusion_layer = FusionModule(1024, num_head=8)
-        self.cross_attention_layer = CrossAttentionBlock(1024, 8)
-        
-        # MMP Prediction Heads
-        self.prot_pred_head = nn.Sequential(
-            nn.Linear(disease_out_dim, disease_out_dim),
-            nn.ReLU(),
-            nn.Linear(disease_out_dim, 1280)  #vocabulary size : prot model tokenize length 30   446
-        )
-        self.dise_pred_head = nn.Sequential(
-            nn.Linear(disease_out_dim, disease_out_dim),
-            nn.ReLU(),
-            nn.Linear(disease_out_dim, 768) #vocabulary size : disease model tokenize length 30522
-        )
         
         if self.use_miner:
             self.miner = miners.TripletMarginMiner(
@@ -391,26 +326,11 @@ class GDA_Metric_Learning(GDANet):
             input_ids=dis_input_ids, attention_mask=dis_attention_mask, return_dict=True
         ).last_hidden_state
         last_hidden_state2 = self.dis_reg(last_hidden_state2)
+        
        # Apply the cross-attention layer
-        prot_fused, dis_fused = self.cross_attention_layer(
+        prot_fused, dis_fused = self.fusion_layer(
             last_hidden_state1, last_hidden_state2, prot_attention_mask, dis_attention_mask
         )
-
-        # last_hidden_state1 = self.prot_encoder(
-        #     query_toks1, return_dict=True
-        # ).last_hidden_state
-        # last_hidden_state1 = self.prot_reg(
-        #     last_hidden_state1
-        # )  # transform the prot embedding into the same dimension as the disease embedding
-        # last_hidden_state2 = self.disease_encoder(
-        #     query_toks2, return_dict=True
-        # ).last_hidden_state
-        # last_hidden_state2 = self.dis_reg(
-        #     last_hidden_state2
-        # )  # transform the disease embedding into 1024
-        
-       # Apply the fusion layer and Recovery of representational shape
-       # prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
         
         if self.agg_mode == "cls":
             query_embed1 = prot_fused[:, 0]  # query : [batch_size, hidden]
@@ -454,26 +374,12 @@ class GDA_Metric_Learning(GDANet):
             input_ids=dis_input_ids, attention_mask=dis_attention_mask, return_dict=True
         ).last_hidden_state
         last_hidden_state2 = self.dis_reg(last_hidden_state2)
+        
        # Apply the cross-attention layer
-        prot_fused, dis_fused = self.cross_attention_layer(
+        prot_fused, dis_fused = self.fusion_layer(
             last_hidden_state1, last_hidden_state2, prot_attention_mask, dis_attention_mask
         )
-       #  last_hidden_state1 = self.prot_encoder(
-       #      query_toks1, return_dict=True
-       #  ).last_hidden_state
         
-       #  last_hidden_state1 = self.prot_reg(
-       #      last_hidden_state1
-       #  )  # transform the prot embedding into the same dimension as the disease embedding
-       #  last_hidden_state2 = self.disease_encoder(
-       #      query_toks2, return_dict=True
-       #  ).last_hidden_state
-       #  last_hidden_state2 = self.dis_reg(
-       #      last_hidden_state2
-       #  )  # transform the disease embedding into 1024
-        
-       # # Apply the fusion layer and Recovery of representational shape
-       #  prot_fused, dis_fused = self.fusion_layer(last_hidden_state1, last_hidden_state2)
         if self.agg_mode == "cls":
             query_embed1 = prot_pred[:, 0]  # query : [batch_size, hidden]
             query_embed2 = dise_pred[:, 0]  # query : [batch_size, hidden]
