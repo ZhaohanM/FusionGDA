@@ -242,13 +242,13 @@ def encode_pretrained_feature(args, disGeNET):
         valid_dataloader = DataLoader(
             valid_examples,
             batch_size=args.batch_size,
-            shuffle=True,
+            shuffle=False,
             collate_fn=collate_fn_batch_encoding,
         )
         test_dataloader = DataLoader(
             test_examples,
             batch_size=args.batch_size,
-            shuffle=True,
+            shuffle=False,
             collate_fn=collate_fn_batch_encoding,
         )
         print( f"dataset loaded: train-{len(train_examples)}; valid-{len(valid_examples)}; test-{len(test_examples)}")
