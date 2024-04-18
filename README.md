@@ -1,10 +1,8 @@
 # Heterogeneous biomedical entity representation learning for gene-disease association prediction
 
-[FusionGDA Architecture](/Figure/FusionGDA.pdf)
+![FusionGDA](Figure/FusionGDA.jpg)
 
 ## Installation
-
-
 
 ```bash
 # Download the latest Anaconda installer
