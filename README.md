@@ -9,7 +9,7 @@
 
 <div style="display: flex; align-items: center;">
     <img src="Figure/FusionGDA.jpg" alt="FusionGDA" width="300"/>
-    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="500" style="margin-left: 20px;"/>
+    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="800" style="margin-left: 20px;"/>
 </div>
 
 
