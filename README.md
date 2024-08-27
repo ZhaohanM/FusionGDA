@@ -9,7 +9,7 @@
 
 <div style="display: flex; align-items: center;">
     <img src="Figure/FusionGDA.jpg" alt="FusionGDA" width="300"/>
-    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="500" style="margin-left: 20px;"/>
+    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="500" style="margin-left: 50px;"/>
 </div>
 
 
@@ -68,7 +68,7 @@ Check your results in the wandb account.
 We store all required datasets in the Google Drive. [Here](https://drive.google.com/file/d/1o4h2Dwfb4DtYgKD2K0hgHneowhE1OYEn/view?usp=share_link)
 
 ## Citation
-Please cite our [paper](https://arxiv.org/abs/2406.01651) if you find our work useful in your own research.
+Please cite our [paper](https://academic.oup.com/bib/article/25/5/bbae380/7735275) if you find our work useful in your own research.
 ```
 @article{meng2024heterogeneous,
   title={Heterogeneous biomedical entity representation learning for gene-disease association prediction},
