@@ -2,7 +2,7 @@
 
 <div align="left">
 
-[![Paper][![Paper](https://img.shields.io/badge/Briefings%20in%20Bioinformatics-2406.01651-B31B1B.svg)](https://academic.oup.com/bib/article/25/5/bbae380/7735275)
+[![Paper](https://img.shields.io/badge/Briefings%20in%20Bioinformatics-2406.01651-B31B1B.svg)](https://academic.oup.com/bib/article/25/5/bbae380/7735275)
 [![Demo](https://img.shields.io/badge/Hugging%20Face-Spaces-yellow)](https://huggingface.co/spaces/Gla-AI4BioMed-Lab/FusionGDA)
 
 </div>
