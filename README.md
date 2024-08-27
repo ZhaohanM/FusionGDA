@@ -1,6 +1,13 @@
 # Heterogeneous biomedical entity representation learning for gene-disease association prediction
 
-![FusionGDA](Figure/FusionGDA.jpg)
+<div align="left">
+
+[![Paper][![Paper](https://img.shields.io/badge/Briefings%20in%20Bioinformatics-2406.01651-B31B1B.svg)](https://academic.oup.com/bib/article/25/5/bbae380/7735275)
+[![Demo](https://img.shields.io/badge/Hugging%20Face-Spaces-yellow)](https://huggingface.co/spaces/Gla-AI4BioMed-Lab/FusionGDA)
+
+</div>
+
+<img src="Figure/FusionGDA.jpg" alt="FusionGDA" width="300"/>
 
 ## Installation
 
@@ -55,6 +62,21 @@ Check your results in the wandb account.
 ## Datasets
 
 We store all required datasets in the Google Drive. [Here](https://drive.google.com/file/d/1o4h2Dwfb4DtYgKD2K0hgHneowhE1OYEn/view?usp=share_link)
+
+## Citation
+Please cite our [paper](https://arxiv.org/abs/2406.01651) if you find our work useful in your own research.
+```
+@article{meng2024heterogeneous,
+  title={Heterogeneous biomedical entity representation learning for gene-disease association prediction},
+  author={Meng, Zhaohan and Liu, Siwei and Liang, Shangsong and Jani, Bhautesh and Meng, Zaiqiao},
+  journal={Briefings in Bioinformatics},
+  volume={25},
+  number={5},
+  pages={bbae380},
+  year={2024},
+  publisher={Oxford University Press}
+}
+```
 
 
 
