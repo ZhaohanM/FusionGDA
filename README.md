@@ -8,9 +8,10 @@
 </div>
 
 <div style="display: flex; align-items: center;">
-    <img src="Figure/FusionGDA.jpg" alt="FusionGDA" style="max-width: 40%; height: auto;"/>
-    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" style="max-width: 60%; height: auto; margin-left: 20px;"/>
+    <img src="Figure/FusionGDA.jpg" alt="FusionGDA" width="300"/>
+    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="500" style="margin-left: 20px;"/>
 </div>
+
 
 ## Installation
 
