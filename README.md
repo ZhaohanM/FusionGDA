@@ -69,7 +69,7 @@ Check your results in the wandb account.
 
 ## Datasets
 
-We store all required datasets in the Google Drive. [Here](https://drive.google.com/file/d/1o4h2Dwfb4DtYgKD2K0hgHneowhE1OYEn/view?usp=share_link)
+We store all required datasets in the Drive. [Here](https://gla-my.sharepoint.com/:u:/r/personal/2582280m_student_gla_ac_uk/Documents/GDA_Data.zip?csf=1&web=1&e=20xaOo)
 
 ## Citation
 Please cite our [paper](https://academic.oup.com/bib/article/25/5/bbae380/7735275) if you find our work useful in your own research.
