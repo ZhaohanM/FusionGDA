@@ -7,13 +7,13 @@
 
 </div>
 
-The FusionGDA model utilises a fusion module to enrich the gene and disease semantic representations encoded by pre-trained language models for GDA prediction.
+The FusionGDA model utilises an attention-besed fusion module to enrich the gene and disease semantic representations encoded by pre-trained language models for GDA prediction.
 
 ## Framework and Fusion Module
 
 <div style="display: flex; align-items: center;">
-    <img src="Figure/FusionGDA.jpg" alt="FusionGDA" width="300"/>
-    <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="500" style="margin-left: 50px;"/>
+    <img src="Figure/FusionGDA.jpg" alt="FusionGDA" width="600"/>
+    <!-- <img src="Figure/Fusion_Module.jpg" alt="Fusion Module" width="500" style="margin-left: 50px;"/> -->
 </div>
 
 
