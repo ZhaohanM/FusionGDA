@@ -2,7 +2,6 @@ import logging
 import sys
 import numpy as np
 sys.path.append("../")
-from tdc.multi_pred import GDA
 import pandas as pd
 from torch.utils.data import Dataset
 
