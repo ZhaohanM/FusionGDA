@@ -2,7 +2,6 @@ import json
 import sys
 import os
 import torch
-from tdc.multi_pred import GDA
 from utils.data_loader import GDA_Dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
