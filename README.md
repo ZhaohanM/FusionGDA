@@ -40,10 +40,8 @@ conda update --all
 RUN conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 
 # Install other Python packages
-pip install pytdc
 pip install wandb
 pip install lightgbm
-pip install -U adapter-transformers
 pip install pytorch-metric-learning
 ```
 
