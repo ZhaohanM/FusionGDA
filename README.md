@@ -9,8 +9,7 @@
 </div>
 
 ---
-
-The **FusionGDA** model introduces an *attention-based fusion module* to enrich the semantic representations of **genes** and **diseases** encoded by pre-trained language models, enabling more accurate **gene–disease association (GDA)** prediction.
+The **FusionGDA** model employs a **contrastive learning–based training strategy** to refine the representations of **genes** and **diseases** derived from pre-trained language models, and further introduces an *attention-based fusion module* to integrate these representations for more accurate **gene–disease association (GDA)** prediction.
 
 ---
 
